@@ -1,75 +1,212 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useState } from 'react';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function App() {
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+const [tabuleiro, setTabuleiro] = useState(Array(9).fill(null));
+const [jogadorAtual, setJogadorAtual] = useState('X');
+const [mensagem, setMensagem] = useState('');
+const [corMensagem, setCorMensagem] = useState('black');
+
+const azul = '#0000FF';
+const verde = "#94E9D4";
+
+const trocarBotao = (indice) => {
+
+    if(tabuleiro[indice] !== null || mensagem !== ''){
+      return;
+    }
+
+    const novoTabuleiro = [...tabuleiro];
+    novoTabuleiro[indice] = jogadorAtual;
+    setTabuleiro(novoTabuleiro);
+
+    const vencedor = verificarVencedor(novoTabuleiro);
+    if (vencedor) {
+      setMensagem(`Jogador ${vencedor} venceu!`);
+      setCorMensagem(vencedor === 'X' ? azul : verde);
+      return;
+    }
+
+    if (novoTabuleiro.every(celula => celula !== null)){
+      setMensagem('Empate!')
+      setCorMensagem('black');
+    }
+
+    setJogadorAtual(jogadorAtual === 'X' ? 'O' : 'X');
+};
+
+const verificarVencedor = (tabuleiro) => {
+const combinacoesVitoria = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+];
+
+
+  for (let i = 0; i < combinacoesVitoria.length; i++){
+    const [a, b, c] = combinacoesVitoria[i];
+    if (tabuleiro[a] && tabuleiro[a] === tabuleiro[b] && tabuleiro[a] === tabuleiro[c]){
+      return tabuleiro[a];
+    }
+  }
+  return null;
+};
+
+const resetarJogo = () => {
+  setTabuleiro(Array(9).fill(null));
+  setJogadorAtual('X');
+  setMensagem('');
+  setCorMensagem('black');
+};
+
+const renderizarCelula = (indice) => (
+  <TouchableOpacity style={Styles.botao} onPress={() => trocarBotao(indice)}>
+    <Text style={[Styles.texto, { color: tabuleiro[indice] === 'X' ? azul : verde }]}>
+      {tabuleiro[indice]}
+    </Text>
+  </TouchableOpacity>
+);
+
+
+	return (
+    
+    <View style={Styles.container}>
+      <Text style={Styles.titulo}>Jogo da Velha</Text>
+
+<View style={Styles.linha}>
+  <TouchableOpacity style={Styles.botao} onPress={() => trocarBotao(0)}>
+    <Text style={[Styles.texto, { color: tabuleiro[0] === 'X' ? azul : verde }]}>
+      {tabuleiro[0]}
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity style={Styles.botao} onPress={() => trocarBotao(1)}>
+    <Text style={[Styles.texto, { color: tabuleiro[1] === 'X' ? azul : verde }]}>
+      {tabuleiro[1]}
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity style={Styles.botao} onPress={() => trocarBotao(2)}>
+    <Text style={[Styles.texto, { color: tabuleiro[2] === 'X' ? azul : verde }]}>
+      {tabuleiro[2]}
+    </Text>
+  </TouchableOpacity>
+</View>
+
+
+
+                
+<View style={Styles.linha}>
+  <TouchableOpacity style={Styles.botao} onPress={() => trocarBotao(3)}>
+    <Text style={[Styles.texto, { color: tabuleiro[3] === 'X' ? azul : verde }]}>
+      {tabuleiro[3]}
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity style={Styles.botao} onPress={() => trocarBotao(4)}>
+    <Text style={[Styles.texto, { color: tabuleiro[4] === 'X' ? azul : verde }]}>
+      {tabuleiro[4]}
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity style={Styles.botao} onPress={() => trocarBotao(5)}>
+    <Text style={[Styles.texto, { color: tabuleiro[5] === 'X' ? azul : verde }]}>
+      {tabuleiro[5]}
+    </Text>
+  </TouchableOpacity>
+</View>
+
+
+                
+<View style={Styles.linha}>
+  <TouchableOpacity style={Styles.botao} onPress={() => trocarBotao(6)}>
+    <Text style={[Styles.texto, { color: tabuleiro[6] === 'X' ? azul : verde }]}>
+      {tabuleiro[6]}
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity style={Styles.botao} onPress={() => trocarBotao(7)}>
+    <Text style={[Styles.texto, { color: tabuleiro[7] === 'X' ? azul : verde }]}>
+      {tabuleiro[7]}
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity style={Styles.botao} onPress={() => trocarBotao(8)}>
+    <Text style={[Styles.texto, { color: tabuleiro[8] === 'X' ? azul : verde }]}>
+      {tabuleiro[8]}
+    </Text>
+  </TouchableOpacity>
+</View>
+
+
+    {/* Mensagem de vitória ou empate */}
+    <Text style={[Styles.mensagem, { color: corMensagem}]}>
+    {mensagem}
+    </Text>
+
+    {/* Botão para reiniciar o jogo */}
+    <TouchableOpacity style={Styles.resetBtn} onPress={resetarJogo}>
+    <Text style={Styles.textoReset}>Resetar</Text>
+    </TouchableOpacity>
+    </View>
+
+	);
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+const Styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#FFFF',
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  titulo: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  linha: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  botao: {
+    width: 100,
+    height: 100,
+    borderWidth: 1,
+    borderColor: '#CCC',
+    margin: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  texto: {
+    fontSize: 50,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
+  },
+  mensagem: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginTop: 15,
+  },
+  resetBtn: {
+    backgroundColor: '#94E9D4',
+    padding: 15,
+    marginTop: 10,
+    borderRadius: 10,
+    width: 150,
+  },
+  textoReset: {
+    color: '#FFF',
+    fontSize: 18,
+    textAlign: 'center',
   },
 });
+
